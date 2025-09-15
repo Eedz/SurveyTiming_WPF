@@ -1,0 +1,160 @@
+﻿<Window x:Class="SurveyTiming_WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SurveyTiming_WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" WindowState="Maximized">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="{Binding NewTimingCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Weights">
+                <MenuItem Header="Import Weights" Command="{Binding ImportWeightsFromWordCommand}"/>
+                <MenuItem Header="Find filter" Command="{Binding FindFilterCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Reports">
+                <MenuItem Header="Timing Report" Command="{Binding GenerateTimingReportCommand}"/>
+                <MenuItem Header="Country Report" Command="{Binding GenerateCountryReportCommand}"/>
+                <MenuItem Header="Missing Weights" Command="{Binding GenerateMissingWeightsReportCommand}"/> 
+            </MenuItem>
+            <MenuItem Header="SAS Syntax">
+                <MenuItem Header="Create Freq Code" Command="{Binding CreateFreqCodeCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Options">
+                <MenuItem Header="Inlude Notes" Command="{Binding ToggleIncludeNotesCommand}"/> 
+            </MenuItem>
+        </Menu>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="150"></RowDefinition>
+            <RowDefinition Height="500"></RowDefinition>
+            <RowDefinition Height="400"></RowDefinition>
+        </Grid.RowDefinitions>
+
+       
+        
+        <TextBlock Text="Survey Timing Tool" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.ColumnSpan="2"/> 
+
+        <!-- Current Survey and weight status -->
+        <Border Margin="3" Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+            <StackPanel  Margin="3">
+                <StackPanel Height="30" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+                    <TextBlock Text="Survey" FontSize="14" VerticalAlignment="Center"/>
+                    <ComboBox Margin="3"  FontSize="14" Width="80" ItemsSource="{Binding AllSurveys}" SelectedItem="{Binding CurrentSurvey}"/>
+
+                </StackPanel>
+                <TextBlock Text="{Binding ImportStatus}" d:Text="### weights automatically assigned...etc..."/>
+            </StackPanel>
+        </Border>
+            <!-- total time and a summary of surrounding times -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="3">
+            <Button Content="Re-Time" Width="80" Command="{Binding CalculateTimingCommand}" HorizontalAlignment="Left"/>
+            <TextBlock Text="Total Survey Time" FontSize="16"/>
+            
+            <TextBox Text="{Binding WPM}"/>
+            
+            <TextBlock Text="{Binding TotalTime}" d:Text="TotalTime"/>
+
+            <TextBlock Text="{Binding SelectedTotalTime}" d:Text="SelectedTotalTime"/>
+            
+        </StackPanel>
+        <!-- Weighted Questions -->
+        <Grid Grid.Row="2" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"> </RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <DockPanel>
+                <Button Content="Refresh" Width="80" Height="20" HorizontalAlignment="Left"/>
+                <TextBlock VerticalAlignment="Center" Margin="10,0,0,0">
+                    <Run Text="Weighted Questions: "/>
+                    <Run Text="{Binding WeightedQuestions.Count, Mode=OneWay}"/>
+                </TextBlock >
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock Text="Go To" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <ComboBox Width="80" Height="20" Margin="0,0,5,0"  ItemsSource="{Binding QuestionList}" SelectedItem="{Binding SelectedQuestion}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <DockPanel Grid.Row="2" >
+
+                <Border BorderBrush="Gray" BorderThickness="1">
+                    <DataGrid ItemsSource="{Binding WeightedQuestions}" 
+                        AutoGenerateColumns="False" 
+                        HeadersVisibility="Column"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        IsReadOnly="True"
+                        Margin="5"
+                        GridLinesVisibility="None"
+                        SelectedItem="{Binding SelectedQuestion}"
+                        SelectionUnit="FullRow"
+                        local:DataGridScrollToSelectedBehavior.ScrollOnSelected="True"
+                        local:DataGridSelectedItemsBehavior.BindableSelectedItems="{Binding SelectedQuestions}">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
+                            <DataGridTextColumn Header="VarName" Binding="{Binding VarName}" Width="Auto"/>
+                            <DataGridTextColumn Header="VarLabel" Binding="{Binding VarName.VarLabel}" Width="300"/>
+                            <DataGridTextColumn Header="Weight" Binding="{Binding Weight.Value}" Width="Auto"/>
+                            <DataGridTextColumn Header="Words" Binding="{Binding GetWordCount}" Width="Auto"/>
+                            <DataGridTextColumn Header="Time (W)" Binding="{Binding WeightedSeconds}" Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </DockPanel>
+        </Grid>
+        
+        <!-- Question View -->
+        <StackPanel Grid.Row="2" Grid.Column="1" Grid.RowSpan="2">
+            <local:LinkedQuestionView/>
+        </StackPanel>
+        
+        <!-- Missing Weights -->
+        <Grid Grid.Row="3" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Margin="5,5">
+                <Run Text="Missing Weights: " />
+                <Run Text="{Binding MissingWeights.Count, Mode=OneWay}"/>
+            </TextBlock>
+
+            <DockPanel Grid.Row="1" >
+                    <Border BorderBrush="Gray" BorderThickness="1">
+                    <DataGrid ItemsSource="{Binding MissingWeights}" 
+                        AutoGenerateColumns="False" 
+                        HeadersVisibility="Column"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        IsReadOnly="True"
+                        Margin="5"
+                        GridLinesVisibility="None">
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
+                            <DataGridTextColumn Header="VarName" Binding="{Binding VarName}" Width="Auto"/>
+                            <DataGridTextColumn Header="VarLabel" Binding="{Binding VarName.VarLabel}" Width="300"/>
+                            <DataGridTextColumn Header="W" Binding="{Binding Weight.Value}" Width="Auto"/>
+                            <DataGridTextColumn Header="s" Binding="{Binding Seconds}" Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </DockPanel>
+                
+        </Grid>
+
+       
+    </Grid>
+    </DockPanel>
+</Window>

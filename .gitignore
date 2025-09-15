@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/SurveyTiming_WPF/bin/Debug/net8.0-windows
+/SurveyTiming_WPF/obj

@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="SurveyTiming_WPF.LinkedQuestionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SurveyTiming_WPF"
+             xmlns:converters="clr-namespace:MvvmLib.Converters;assembly=MvvmLib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:HtmlToFlowDocumentConverter x:Key="HtmlToFlow" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60"></ColumnDefinition>
+            <ColumnDefinition ></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Grid.Column="1">
+            <TextBlock Text="{Binding SelectedQuestion.Qnum}" Width="50" d:Text="Qnum" Margin="2,0,15,0" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding SelectedQuestion.VarName}" Width="80" d:Text="VarName" Margin="2,0,15,0" HorizontalAlignment="Center"/>
+            <TextBox Text="{Binding SelectedQuestion.Weight.Value}" Width="50" d:Text="Weight" Margin="2,0,15,0" HorizontalAlignment="Right"/>
+        </DockPanel>
+        <!-- List of PreP and PstP variables -->
+        <Border BorderBrush="Gray" BorderThickness="1" Margin="3">
+            <StackPanel Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding SelectedQuestion.FilteredOn}" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding VarName.VarName}" d:Content="PrePVarName" Command="{Binding GoToVarCommand}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding SelectedQuestion.Routes}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding VarName.VarName}" d:Content="PstPVarName" Command="{Binding GoToVarCommand}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+        <DockPanel Grid.Row="1" Grid.Column="2">
+            <FlowDocumentScrollViewer IsToolBarVisible="False" BorderBrush="LightGray" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10" >
+                <FlowDocumentScrollViewer.Document>
+                    <Binding Path="CurrentQuestionText" Converter="{StaticResource HtmlToFlow}" />
+                </FlowDocumentScrollViewer.Document>
+            </FlowDocumentScrollViewer>
+        </DockPanel>
+    </Grid>
+</UserControl>
