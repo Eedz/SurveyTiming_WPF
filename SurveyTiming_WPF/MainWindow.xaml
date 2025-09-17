@@ -4,8 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SurveyTiming_WPF"
+        xmlns:converters ="clr-namespace:MvvmLib.Converters;assembly=MvvmLib"
         mc:Ignorable="d"
         Title="MainWindow" WindowState="Maximized">
+    <Window.Resources>
+        <converters:QuestionTypeToBrushConverter x:Key="QuestionTypeToBrushConverter"/>
+        <converters:QuestionTypeToFontWeightConverter x:Key="QuestionTypeToFontWeightConverter"/>
+
+        <Style x:Key="QuestionRowStyle" TargetType="DataGridRow">
+            <Setter Property="Foreground" Value="{Binding QuestionType, Converter={StaticResource QuestionTypeToBrushConverter}}"/>
+            <Setter Property="FontWeight" Value="{Binding QuestionType, Converter={StaticResource QuestionTypeToFontWeightConverter}}"/>
+        </Style>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -99,7 +109,8 @@
                         SelectedItem="{Binding SelectedQuestion}"
                         SelectionUnit="FullRow"
                         local:DataGridScrollToSelectedBehavior.ScrollOnSelected="True"
-                        local:DataGridSelectedItemsBehavior.BindableSelectedItems="{Binding SelectedQuestions}">
+                        local:DataGridSelectedItemsBehavior.BindableSelectedItems="{Binding SelectedQuestions}"
+                        RowStyle="{StaticResource QuestionRowStyle}">
 
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
@@ -139,7 +150,9 @@
                         CanUserDeleteRows="False"
                         IsReadOnly="True"
                         Margin="5"
-                        GridLinesVisibility="None">
+                        GridLinesVisibility="None"
+                        local:DataGridScrollToSelectedBehavior.ScrollOnSelected="True"
+                        RowStyle="{StaticResource QuestionRowStyle}">
 
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>

@@ -29,7 +29,7 @@ namespace SurveyTiming_WPF
     // TODO: show variable info in preview pane (weight, source, time etc)
     // DONE: add word count, remove raw seconds, 
     // TODO: frequency code generation
-    // TODO: color code list items based on question type
+    // DONE: color code list items based on question type
 
     public partial class MainWindowViewModel : ViewModelBase
     {
