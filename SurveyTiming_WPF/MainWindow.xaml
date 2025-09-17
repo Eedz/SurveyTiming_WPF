@@ -47,7 +47,7 @@
             <RowDefinition Height="40"></RowDefinition>
             <RowDefinition Height="150"></RowDefinition>
             <RowDefinition Height="500"></RowDefinition>
-            <RowDefinition Height="400"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
        
@@ -98,7 +98,7 @@
             <DockPanel Grid.Row="2" >
 
                 <Border BorderBrush="Gray" BorderThickness="1">
-                    <DataGrid ItemsSource="{Binding WeightedQuestions}" 
+                        <DataGrid ItemsSource="{Binding WeightedQuestions}" 
                         AutoGenerateColumns="False" 
                         HeadersVisibility="Column"
                         CanUserAddRows="False"
@@ -112,16 +112,16 @@
                         local:DataGridSelectedItemsBehavior.BindableSelectedItems="{Binding SelectedQuestions}"
                         RowStyle="{StaticResource QuestionRowStyle}">
 
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
-                            <DataGridTextColumn Header="VarName" Binding="{Binding VarName}" Width="Auto"/>
-                            <DataGridTextColumn Header="VarLabel" Binding="{Binding VarName.VarLabel}" Width="300"/>
-                            <DataGridTextColumn Header="Weight" Binding="{Binding Weight.Value}" Width="Auto"/>
-                            <DataGridTextColumn Header="Words" Binding="{Binding GetWordCount}" Width="Auto"/>
-                            <DataGridTextColumn Header="Time (W)" Binding="{Binding WeightedSeconds}" Width="Auto"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
+                                <DataGridTextColumn Header="VarName" Binding="{Binding VarName}" Width="Auto"/>
+                                <DataGridTextColumn Header="VarLabel" Binding="{Binding VarName.VarLabel}" Width="300"/>
+                                <DataGridTextColumn Header="Weight" Binding="{Binding Weight.Value}" Width="Auto"/>
+                                <DataGridTextColumn Header="Words" Binding="{Binding GetWordCount}" Width="Auto"/>
+                                <DataGridTextColumn Header="Time (W)" Binding="{Binding WeightedSeconds}" Width="Auto"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
             </DockPanel>
         </Grid>
         
@@ -158,16 +158,53 @@
                             <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
                             <DataGridTextColumn Header="VarName" Binding="{Binding VarName}" Width="Auto"/>
                             <DataGridTextColumn Header="VarLabel" Binding="{Binding VarName.VarLabel}" Width="300"/>
-                            <DataGridTextColumn Header="W" Binding="{Binding Weight.Value}" Width="Auto"/>
-                            <DataGridTextColumn Header="s" Binding="{Binding Seconds}" Width="Auto"/>
+                            <DataGridTextColumn Header="Weight" Binding="{Binding Weight.Value}" Width="Auto"/>
+                            <DataGridTextColumn Header="Words" Binding="{Binding GetWordCount}" Width="Auto"/>
+                            <DataGridTextColumn Header="Time (W)" Binding="{Binding WeightedSeconds}" Width="Auto"/>
                         </DataGrid.Columns>
+                            
                     </DataGrid>
                 </Border>
             </DockPanel>
                 
         </Grid>
 
-       
+            <!-- Search Area -->
+        <Grid Grid.Row="3" Grid.Column="1" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Height="30">
+                <TextBox Text="{Binding SearchTerm}" Width="200" d:Text="Search Term..." AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="200" Margin="3"/>
+                <!--<TextBlock Text="Search Questions:" VerticalAlignment="Center" Margin="3"/>-->
+                <Button Content="Find Next" Width="80" Command="{Binding SearchFilterCommand}" Margin="3"/>
+                <Button Content="Clear" Width="80" Command="{Binding ClearSearchCommand}" Margin="3"/>
+
+            </StackPanel>
+
+            <DockPanel Grid.Row="1">
+                <Border>
+                    <DataGrid ItemsSource="{Binding SearchResults}"
+                            ScrollViewer.VerticalScrollBarVisibility="Visible"
+                            AutoGenerateColumns="False"
+                            CanUserAddRows="False"
+                            IsReadOnly="True"
+                            Margin="10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="VarName" Binding="{Binding VarName.VarName}" Width="60"/>
+                            <DataGridTextColumn Header="Qnum" Binding="{Binding Qnum}" Width="60"/>
+                            <DataGridTextColumn Header="Text" Binding="{Binding PrePW.WordingText}" Width="3*"/>
+                            <DataGridTextColumn Header="Weight" Binding="{Binding Weight.Value}" Width="*"/>
+                            <DataGridTextColumn Header="Source" Binding="{Binding Weight.Source}" Width="Auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </DockPanel>
+
+        </Grid>
+
+          
     </Grid>
     </DockPanel>
 </Window>

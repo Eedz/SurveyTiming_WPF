@@ -22,11 +22,11 @@ namespace SurveyTiming_WPF
     // DONE: missing weights
     // TODO: show prep vars
     // TODO: show pstp vars
-    // TODO: find filter (with full question or at least prep)
+    // DONE: find filter (with full question or at least prep)
     // DONE: import weights from word
     // DONE: time each question for list
     // DONE: go to var box
-    // TODO: show variable info in preview pane (weight, source, time etc)
+    // DONE: show variable info in preview pane (weight, source, time etc)
     // DONE: add word count, remove raw seconds, 
     // TODO: frequency code generation
     // DONE: color code list items based on question type
@@ -47,6 +47,9 @@ namespace SurveyTiming_WPF
         private ObservableCollection<LinkedQuestion> selectedQuestions = new ObservableCollection<LinkedQuestion>();
 
         [ObservableProperty]
+        private ObservableCollection<LinkedQuestion> searchResults = new ObservableCollection<LinkedQuestion>();
+
+        [ObservableProperty]
         private LinkedQuestion selectedQuestion;
 
         public string CurrentQuestionText => SelectedQuestion != null ? SelectedQuestion.GetQuestionTextHTML() : string.Empty;
@@ -61,7 +64,9 @@ namespace SurveyTiming_WPF
         [ObservableProperty]
         private string importStatus = string.Empty;
 
-        
+        [ObservableProperty]
+        private string searchTerm = string.Empty;
+
         public List<Survey> AllSurveys { get; set; } = new List<Survey>();
 
         public IEnumerable<LinkedQuestion> WeightedQuestions => QuestionList?.Where(x => x?.Weight?.Value >= 0) ?? Enumerable.Empty<LinkedQuestion>();
@@ -252,6 +257,26 @@ namespace SurveyTiming_WPF
             File.WriteAllText(filename, sas);
 
             System.Diagnostics.Process.Start(filename);
+        }
+
+        [RelayCommand]
+        private void SearchFilter()
+        {
+            if (string.IsNullOrEmpty(SearchTerm))
+            {
+                SearchResults.Clear();
+                return;
+            }
+            var results = QuestionList.Where(q => q.PrePW.WordingText.IndexOf(SearchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                || q.VarName.RefVarName.IndexOf(SearchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            SearchResults = new ObservableCollection<LinkedQuestion>(results);
+        }
+
+        [RelayCommand]
+        private void ClearSearch()
+        {
+            SearchTerm = string.Empty;
+            SearchResults.Clear();
         }
 
         private string GetTiming(IEnumerable<LinkedQuestion> questions)
