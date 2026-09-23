@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using ITC_Contracts;
 using ITC_Services;
 using ITCLib;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +30,7 @@ namespace SurveyTiming_WPF
     // DONE: add word count, remove raw seconds, 
     // TODO: frequency code generation
     // DONE: color code list items based on question type
+    // TODO: go to Var in unweighted list
 
     public partial class MainWindowViewModel : ViewModelBase
     {
@@ -121,7 +122,7 @@ namespace SurveyTiming_WPF
                     ImportWeights(Path.Combine(countryFolder, CurrentSurvey.SurveyCode + "-stage2.txt"));
                     ImportWeights(Path.Combine(countryFolder, CurrentSurvey.SurveyCode + "-stage3.txt"));
                     ImportWeights(Path.Combine(countryFolder, CurrentSurvey.SurveyCode + "-stage4.txt"));
-                    linkedQuestions.ForEach(q => q.Seconds= Math.Round(q.GetTiming(WPM),2));
+                    linkedQuestions.ForEach(q => q.Seconds= Math.Round(q.GetTiming(WPM, true),2));
                     OnPropertyChanged(nameof(WeightedQuestions));
                     OnPropertyChanged(nameof(MissingWeights));
                 }
@@ -136,6 +137,40 @@ namespace SurveyTiming_WPF
             }
         }
 
+        private SurveyQuestion MapToEntity(SurveyQuestionDto dto)
+        {
+            return new SurveyQuestion
+            {
+                ID = dto.ID,
+                SurveyCode = dto.SurveyCode,
+                VarName = new VariableName(dto.VarName.VarName)
+                {
+                    ID = dto.VarName.ID,
+                    VarLabel = dto.VarName.VarLabel,
+                    Domain = new DomainLabel() { LabelText = dto.VarName.Domain.LabelText, ID = dto.VarName.Domain.ID },
+                    Topic = new TopicLabel() { LabelText = dto.VarName.Topic.LabelText, ID = dto.VarName.Topic.ID },
+                    Content = new ContentLabel() { LabelText = dto.VarName.Content.LabelText, ID = dto.VarName.Content.ID },
+                    Product = new ProductLabel() { LabelText = dto.VarName.Product.LabelText, ID = dto.VarName.Product.ID },
+                    DomainLabel = new VarNameLabel(dto.VarName.Domain.ID, dto.VarName.Domain.LabelText),
+                    TopicLabel = new VarNameLabel(dto.VarName.Topic.ID, dto.VarName.Topic.LabelText),
+                    ContentLabel = new VarNameLabel(dto.VarName.Content.ID, dto.VarName.Content.LabelText),
+                    ProductLabel = new VarNameLabel(dto.VarName.Product.ID, dto.VarName.Product.LabelText)
+                },
+                Qnum = dto.Qnum,
+                AltQnum = dto.AltQnum,
+                AltQnum2 = dto.AltQnum2,
+                AltQnum3 = dto.AltQnum3,
+                PrePW = dto.PrePW == null ? null : new Wording() { WordID = dto.PrePW.ID, WordingText = dto.PrePW.WordingText },
+                PreIW = dto.PreIW == null ? null : new Wording() { WordID = dto.PreIW.ID, WordingText = dto.PreIW.WordingText },
+                PreAW = dto.PreAW == null ? null : new Wording() { WordID = dto.PreAW.ID, WordingText = dto.PreAW.WordingText },
+                LitQW = dto.LitQW == null ? null : new Wording() { WordID = dto.LitQW.ID, WordingText = dto.LitQW.WordingText },
+                PstIW = dto.PstIW == null ? null : new Wording() { WordID = dto.PstIW.ID, WordingText = dto.PstIW.WordingText },
+                PstPW = dto.PstPW == null ? null : new Wording() { WordID = dto.PstPW.ID, WordingText = dto.PstPW.WordingText },
+                RespOptionsS = dto.RespOptionsS == null ? null : new ResponseSet() { RespSetName = dto.RespOptionsS.RespSetName, RespList = dto.RespOptionsS.RespList },
+                NRCodesS = dto.NRCodesS == null ? null : new ResponseSet() { RespSetName = dto.NRCodesS.RespSetName, RespList = dto.NRCodesS.RespList },
+            };
+        }
+
         private async Task LoadSurveyAsync(int surveyId)
         {
             try
@@ -143,7 +178,8 @@ namespace SurveyTiming_WPF
 
                 if (CurrentSurvey != null)
                 {
-                    var questions = await _surveyService.GetQuestionsForSurveyAsync(surveyId);
+                    var questionDtos = await _surveyService.GetQuestionsForSurveyAsync(surveyId);
+                    var questions = questionDtos.Select(MapToEntity).ToList();
                     var linkedQuestions = questions.Select(q => new LinkedQuestion(q)).ToList();
                     QuestionList = new ObservableCollection<LinkedQuestion>(linkedQuestions);
                     SetAutomaticWeights();
@@ -314,7 +350,7 @@ namespace SurveyTiming_WPF
                 {
                     lq.Weight.Value = 0;
                     lq.Weight.Source = "A";
-                    count1++;
+                    count0++;
                 }
                 else if (lq.PrePW.WordingText.StartsWith("Ask all.") || lq.PrePW.WordingText.Contains("Ask all."))
                 {

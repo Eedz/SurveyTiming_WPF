@@ -1,5 +1,7 @@
 ﻿using ITC_DataAccess;
 using ITC_Services;
+using Microsoft.Data.SqlClient;
+
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
@@ -42,16 +44,20 @@ namespace SurveyTiming_WPF
         static ServiceProvider AddServices()
         {
             IServiceCollection services = new ServiceCollection();
-            
-            services.AddSingleton<IFileDialogService, FileDialogService>();
-            services.AddSingleton<IDialogService, DialogService>();
 
+			//services.AddSingleton<IFileDialogService, FileDialogService>();
+			//services.AddSingleton<IDialogService, DialogService>();
+
+            services.AddSingleton<Func<IDbConnection>>(sp => () =>
+            {
 #if DEBUG
-            services.AddScoped<IDbConnection>(db => new Microsoft.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString));
+                return new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionStringTest"].ConnectionString);
 #else
-            services.AddScoped<IDbConnection>(db => new Microsoft.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString));
+                return new SqlConnection(ConfigurationManager.ConnectionStrings["ISISConnectionString"].ConnectionString);
 #endif
-            services.AddSingleton<ISurveyRepository, SurveyRepository>();
+			});
+
+			services.AddSingleton<ISurveyRepository, SurveyRepository>();
             services.AddSingleton<IPeopleRepository, PeopleRepository>();
             services.AddSingleton<ICommentRepository, CommentRepository>();
             services.AddSingleton<IVarNameRepository, VarNameRepository>();
@@ -64,8 +70,6 @@ namespace SurveyTiming_WPF
             services.AddSingleton<IVarNameService, VarNameService>();
             services.AddSingleton<IWordingService, WordingService>();
             services.AddSingleton<IReferenceDataService, ReferenceDataService>();
-            services.AddSingleton<IReferenceDataServiceEF, ReferenceDataServiceEF>();
-            services.AddSingleton<ISurveyServiceEF, SurveyServiceEF>();
             services.AddSingleton<IUserService, UserService>();
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();

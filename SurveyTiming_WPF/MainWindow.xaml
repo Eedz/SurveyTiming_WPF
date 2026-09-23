@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SurveyTiming_WPF"
         xmlns:converters ="clr-namespace:MvvmLib.Converters;assembly=MvvmLib"
+        xmlns:mvvmLib ="clr-namespace:MvvmLib;assembly=MvvmLib"
         mc:Ignorable="d"
         Title="MainWindow" WindowState="Maximized">
     <Window.Resources>
         <converters:QuestionTypeToBrushConverter x:Key="QuestionTypeToBrushConverter"/>
         <converters:QuestionTypeToFontWeightConverter x:Key="QuestionTypeToFontWeightConverter"/>
-
+         
         <Style x:Key="QuestionRowStyle" TargetType="DataGridRow">
             <Setter Property="Foreground" Value="{Binding QuestionType, Converter={StaticResource QuestionTypeToBrushConverter}}"/>
             <Setter Property="FontWeight" Value="{Binding QuestionType, Converter={StaticResource QuestionTypeToFontWeightConverter}}"/>
@@ -59,7 +60,7 @@
             <StackPanel  Margin="3">
                 <StackPanel Height="30" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
                     <TextBlock Text="Survey" FontSize="14" VerticalAlignment="Center"/>
-                    <ComboBox Margin="3"  FontSize="14" Width="80" ItemsSource="{Binding AllSurveys}" SelectedItem="{Binding CurrentSurvey}"/>
+                    <ComboBox Margin="3"  FontSize="14" Width="100" ItemsSource="{Binding AllSurveys}" SelectedItem="{Binding CurrentSurvey}"/>
 
                 </StackPanel>
                 <TextBlock Text="{Binding ImportStatus}" d:Text="### weights automatically assigned...etc..."/>
@@ -108,8 +109,8 @@
                         GridLinesVisibility="None"
                         SelectedItem="{Binding SelectedQuestion}"
                         SelectionUnit="FullRow"
-                        local:DataGridScrollToSelectedBehavior.ScrollOnSelected="True"
-                        local:DataGridSelectedItemsBehavior.BindableSelectedItems="{Binding SelectedQuestions}"
+                        mvvmLib:DataGridHelper.ScrollOnSelected="True"
+                        mvvmLib:DataGridHelper.BindableSelectedItems="{Binding SelectedQuestions}"
                         RowStyle="{StaticResource QuestionRowStyle}">
 
                             <DataGrid.Columns>
@@ -151,7 +152,7 @@
                         IsReadOnly="True"
                         Margin="5"
                         GridLinesVisibility="None"
-                        local:DataGridScrollToSelectedBehavior.ScrollOnSelected="True"
+                        mvvmLib:DataGridHelper.ScrollOnSelected="True"
                         RowStyle="{StaticResource QuestionRowStyle}">
 
                         <DataGrid.Columns>
